@@ -52,16 +52,19 @@ jobs:
           # ln -s /mnt/openwrt/feeds ./feeds
           # ln -s /mnt/openwrt/staging_dir ./staging_dir
           df -h
+          
       - name: add openclsah
         run: |
           cd package
           mkdir openwrt-packages
           cd openwrt-packages
           git clone https://github.com/vernesong/OpenClash.git
+          
       - name: Update feeds
         run: |
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          
       - name: Generate configuration file
         run: |
           rm -f ./.config*
@@ -180,11 +183,13 @@ jobs:
           # 
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
+          
       - name: Make download
         run: |
           make download -j8 || make download -j1 V=s
           find ./dl/ -size -1024c -exec rm -f {} \;
           df -h
+          
       - name: Compile firmware
         run: |
           make -j$(nproc) || make -j1 V=s
@@ -195,6 +200,7 @@ jobs:
           echo "======================="
           du -h ./ --max-depth=1
           du -h /mnt/openwrt/ --max-depth=1
+          
       - name: Prepare artifact
         run: find ./bin/targets/ -type d -name "packages" | xargs rm -rf {}
 
